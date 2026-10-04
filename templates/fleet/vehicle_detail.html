@@ -5,5 +5,36 @@
   <p>{{ vehicle.license_plate }}</p>
   <p>{{ vehicle.current_mileage }}</p>
   <p>{{ vehicle.year }}</p>
+  <p>{{ vehicle.tire_sets }}</p>
+
+  <p>----------------------------------</p>
+  <h3>Maintenance plans</h3>
+  {% for maintenance_plan in maintenance_plans %}
+    <p>{{ maintenance_plan.name }}</p>
+    <p>{{ maintenance_plan.mileage_interval }}</p>
+    <p>{{ maintenance_plan.time_interval_months }}</p>
+    <p><a href="{% url 'fleet:vehicle-maintenance-plan-update' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}">Update</a></p>
+    <p><a href="{% url 'fleet:vehicle-maintenance-plan-delete' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}">Delete</a></p>
+    <p>__________________________________________</p>
+  {% endfor %}
+
+
+  <h3>Service records</h3>
+  {% for service_record in service_records %}
+    <p>{{ service_record.name }}</p>
+    <p>{{ service_record.date }}</p>
+    <p>{{ service_record.mileage }}</p>
+    <p><a href="{% url 'fleet:vehicle-service-record-update' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}">Update</a></p>
+    <p><a href="{% url 'fleet:vehicle-service-record-delete' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}">Delete</a></p>
+    <p>__________________________________</p>
+  {% endfor %}
+
+
+
+  <h3><a href="{% url 'fleet:vehicle-maintenance-plan-create' vehicle_pk=vehicle.pk %}">Create maintenance plan</a></h3>
+  <h3><a href="{% url 'fleet:vehicle-service-record-create' pk=vehicle.pk %}">Create service record</a></h3>
+
+  <h4><a href="{% url 'fleet:vehicle-update' pk=vehicle.pk %}">Update</a></h4>
+  <h5><a href="{% url 'fleet:vehicle-delete' pk=vehicle.pk %}">Delete</a></h5>
 
 {% endblock %}

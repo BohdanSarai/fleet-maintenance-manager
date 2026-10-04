@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 
 
 class CompanyUser(AbstractUser):
@@ -32,6 +33,9 @@ class Vehicle(models.Model):
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.license_plate})"
+
+    def get_absolute_url(self):
+        return reverse("fleet:vehicle-detail", args=[str(self.id)])
 
 
 class MaintenancePlan(models.Model):
