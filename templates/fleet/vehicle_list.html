@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <ul>
+  {% for vehicle in vehicle_list %}
+    <li><a href="{% url 'fleet:vehicle-detail' pk=vehicle.pk %}">{{ vehicle.brand }} {{ vehicle.model }}</a></li>
+
+  {% endfor %}
+  </ul>
+
+{% endblock %}

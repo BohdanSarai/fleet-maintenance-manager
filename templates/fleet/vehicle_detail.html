@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ vehicle.brand }} {{ vehicle.model }}</h2>
+  <p>{{ vehicle.license_plate }}</p>
+  <p>{{ vehicle.current_mileage }}</p>
+  <p>{{ vehicle.year }}</p>
+
+{% endblock %}
