@@ -7,7 +7,8 @@ from django.utils import timezone
 
 from django.views import generic
 
-from .forms import ChangeTiresForm, VehicleSearchForm, EmployeeCreationForm
+from .forms import ChangeTiresForm, VehicleSearchForm, EmployeeCreationForm, VehicleMileageUpdateForm, \
+    MaintenancePlanForm, ServiceRecordForm, TireSetForm
 from .models import Vehicle, ServiceRecord, MaintenancePlan, TireInstallation, TireSet, CompanyUser
 
 
@@ -128,12 +129,29 @@ class VehicleDetailView(LoginRequiredMixin, generic.DetailView):
 
 class VehicleCreateView(LoginRequiredMixin, generic.CreateView):
     model = Vehicle
-    fields = "__all__"
+    fields = (
+        "brand",
+        "model",
+        "year",
+        "license_plate",
+        "vin",
+        "fuel_type",
+        "current_mileage",
+    )
 
 
 class VehicleUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Vehicle
-    fields = "__all__"
+    fields = (
+        "brand",
+        "model",
+        "year",
+        "license_plate",
+        "vin",
+        "fuel_type",
+        "current_mileage",
+        "is_active",
+    )
 
 
 class VehicleDeleteView(LoginRequiredMixin, generic.DeleteView):
@@ -143,22 +161,24 @@ class VehicleDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class ServiceRecordCreateView(LoginRequiredMixin, generic.CreateView):
     model = ServiceRecord
-    fields = (
-        "maintenance_plan",
-        "name",
-        "date",
-        "mileage",
-        "cost",
-        "notes",
-    )
+    form_class = ServiceRecordForm
     template_name = "fleet/service_record_form.html"
 
-
-    def get_form(self, form_class = None):
+    def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        vehicle = Vehicle.objects.get(pk=self.kwargs["pk"])
+
+        vehicle = Vehicle.objects.get(
+            pk=self.kwargs["vehicle_pk"]
+        )
+
         form.instance.vehicle = vehicle
-        form.fields["maintenance_plan"].queryset = MaintenancePlan.objects.filter(vehicle=vehicle)
+
+        form.fields["maintenance_plan"].queryset = (
+            MaintenancePlan.objects.filter(vehicle=vehicle)
+        )
+
+        form.fields["mileage"].initial = vehicle.current_mileage
+
         return form
 
     def form_valid(self, form):
@@ -172,14 +192,7 @@ class ServiceRecordCreateView(LoginRequiredMixin, generic.CreateView):
 
 class ServiceRecordUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = ServiceRecord
-    fields = (
-        "maintenance_plan",
-        "name",
-        "date",
-        "mileage",
-        "cost",
-        "notes",
-    )
+    form_class = ServiceRecordForm
     template_name = "fleet/service_record_form.html"
     pk_url_kwarg = "service_record_pk"
 
@@ -207,7 +220,7 @@ class ServiceRecordDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class MaintenancePlanCreateView(LoginRequiredMixin, generic.CreateView):
     model = MaintenancePlan
-    fields = ("name", "mileage_interval", "time_interval_months", "start_mileage", "start_date", )
+    form_class = MaintenancePlanForm
     template_name = "fleet/maintenance_plan_form.html"
 
 
@@ -223,7 +236,7 @@ class MaintenancePlanCreateView(LoginRequiredMixin, generic.CreateView):
 
 class MaintenancePlanUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = MaintenancePlan
-    fields = ("name", "mileage_interval", "time_interval_months",  "start_mileage", "start_date", )
+    form_class = MaintenancePlanForm
     pk_url_kwarg = "maintenance_plan_pk"
     template_name = "fleet/maintenance_plan_form.html"
 
@@ -364,4 +377,40 @@ class EmployeeStatusUpdateView(
         employee.save()
 
         return redirect("fleet:employee-list")
+
+
+class VehicleMileageUpdateView(
+    LoginRequiredMixin,
+    generic.UpdateView
+):
+    model = Vehicle
+    form_class = VehicleMileageUpdateForm
+    template_name = "fleet/vehicle_mileage_form.html"
+
+    def get_success_url(self):
+        return reverse(
+            "fleet:vehicle-detail",
+            kwargs={"pk": self.object.pk}
+        )
+
+
+
+class TireSetListView(LoginRequiredMixin, generic.ListView):
+    model = TireSet
+    context_object_name = "tire_set_list"
+    template_name = "fleet/tire_set_list.html"
+
+
+class TireSetCreateView(LoginRequiredMixin, generic.CreateView):
+    form_class = TireSetForm
+    template_name = "fleet/tire_set_form.html"
+    success_url = reverse_lazy("fleet:tire-set-list")
+
+
+class TireSetUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = TireSet
+    form_class = TireSetForm
+    template_name = "fleet/tire_set_form.html"
+    success_url = reverse_lazy("fleet:tire-set-list")
+
 

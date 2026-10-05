@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-from fleet.models import TireSet, CompanyUser
+from fleet.models import TireSet, CompanyUser, Vehicle, MaintenancePlan, ServiceRecord
 
 
 class ChangeTiresForm(forms.Form):
@@ -20,7 +20,13 @@ class VehicleSearchForm(forms.Form):
     query = forms.CharField(
         max_length=100,
         required=False,
-        label=""
+        label="",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Search by brand, model or license plate",
+            }
+        ),
     )
 
 
@@ -33,4 +39,76 @@ class EmployeeCreationForm(UserCreationForm):
             "last_name",
             "email",
         )
+
+
+class VehicleMileageUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Vehicle
+        fields = ("current_mileage",)
+        labels = {
+            "current_mileage": "New mileage",
+        }
+
+    def clean_current_mileage(self):
+        new_mileage = self.cleaned_data["current_mileage"]
+
+        if new_mileage < self.instance.current_mileage:
+            raise forms.ValidationError(
+                "New mileage cannot be less than current mileage."
+            )
+
+        return new_mileage
+
+
+class MaintenancePlanForm(forms.ModelForm):
+    class Meta:
+        model = MaintenancePlan
+        fields = (
+            "name",
+            "description",
+            "mileage_interval",
+            "time_interval_months",
+            "start_mileage",
+            "start_date",
+        )
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+        }
+
+
+class ServiceRecordForm(forms.ModelForm):
+    class Meta:
+        model = ServiceRecord
+        fields = (
+            "maintenance_plan",
+            "name",
+            "date",
+            "mileage",
+            "cost",
+            "notes",
+        )
+        widgets = {
+            "date": forms.DateInput(attrs={"type": "date"}),
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+
+
+class TireSetForm(forms.ModelForm):
+    class Meta:
+        model = TireSet
+        fields = (
+            "season",
+            "manufacturer",
+            "model",
+            "size",
+            "max_mileage",
+            "initial_mileage",
+            "purchase_date",
+        )
+        widgets = {
+            "purchase_date": forms.DateInput(
+                attrs={"type": "date"}
+            ),
+        }
+
 

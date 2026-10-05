@@ -1,75 +1,311 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>{{ vehicle.brand }} {{ vehicle.model }}</h2>
-  <p>{{ vehicle.license_plate }}</p>
-  <p>{{ vehicle.current_mileage }}</p>
-  <p>{{ vehicle.year }}</p>
-  <p>{{ vehicle.tire_sets }}</p>
+  <div class="container-fluid">
 
-  <p>----------------------------------</p>
-  <h3>Maintenance plans</h3>
-  {% for maintenance_plan in maintenance_plans %}
-    <p>{{ maintenance_plan.name }}</p>
-    <p>{{ maintenance_plan.mileage_interval }}</p>
-    <p>{{ maintenance_plan.time_interval_months }}</p>
-    <p><a
-        href="{% url 'fleet:vehicle-maintenance-plan-update' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}">Update</a>
-    </p>
-    <p><a
-        href="{% url 'fleet:vehicle-maintenance-plan-delete' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}">Delete</a>
-    </p>
-    <p>__________________________________________</p>
-  {% endfor %}
+    <div class="d-flex justify-content-between align-items-start mb-4">
+      <div>
+        <h1 class="fw-bold mb-1">
+          {{ vehicle.brand }} {{ vehicle.model }}
+        </h1>
+        <p class="text-muted mb-0">
+          {{ vehicle.license_plate }}
+        </p>
+      </div>
 
+      <div class="d-flex gap-2">
+        <a
+            href="{% url 'fleet:vehicle-update' pk=vehicle.pk %}"
+            class="btn btn-outline-primary"
+        >
+          Edit vehicle
+        </a>
 
-  <h3>Service records</h3>
-  {% for service_record in service_records %}
-    <p>{{ service_record.name }}</p>
-    <p>{{ service_record.date }}</p>
-    <p>{{ service_record.mileage }}</p>
-    <p><a
-        href="{% url 'fleet:vehicle-service-record-update' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}">Update</a>
-    </p>
-    <p><a
-        href="{% url 'fleet:vehicle-service-record-delete' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}">Delete</a>
-    </p>
-    <p>__________________________________</p>
-  {% endfor %}
-
-  <h3>Current tires</h3>
-
-  {% if current_tire_installation %}
-    <p>{{ current_tire_installation.tire_set }}</p>
-    <p>{{ current_tire_installation.installed_at_mileage }}</p>
-  {% else %}
-    <p>No tires installed</p>
-  {% endif %}
-
-  <h3>Tire history</h3>
-
-  {% for tire_installation in tire_installations %}
-    <p>{{ tire_installation.tire_set }}</p>
-    <p>{{ tire_installation.installed_at_mileage }}</p>
-    <p>{{ tire_installation.removed_at_mileage }}</p>
-  {% empty %}
-    <p>No tire history</p>
-  {% endfor %}
+        <a
+            href="{% url 'fleet:vehicle-delete' pk=vehicle.pk %}"
+            class="btn btn-outline-danger"
+        >
+          Delete
+        </a>
+      </div>
+    </div>
 
 
-  {% if current_tire_installation %}
-    <a href="{% url 'fleet:vehicle-change-tires' vehicle_pk=vehicle.pk %}">
-      Change tires
-    </a>
-  {% else %}
-    <a href="{% url 'fleet:vehicle-tire-installation-create' vehicle_pk=vehicle.pk %}">
-      Install tire set
-    </a>
-  {% endif %}
-  <h3><a href="{% url 'fleet:vehicle-maintenance-plan-create' vehicle_pk=vehicle.pk %}">Create maintenance plan</a></h3>
-  <h3><a href="{% url 'fleet:vehicle-service-record-create' pk=vehicle.pk %}">Create service record</a></h3>
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="row">
 
-  <h4><a href="{% url 'fleet:vehicle-update' pk=vehicle.pk %}">Update</a></h4>
-  <h5><a href="{% url 'fleet:vehicle-delete' pk=vehicle.pk %}">Delete</a></h5>
+          <div class="col-md-3">
+            <small class="text-muted">Year</small>
+            <p class="fw-semibold mb-0">{{ vehicle.year }}</p>
+          </div>
 
+          <div class="col-md-3">
+            <small class="text-muted">Mileage</small>
+
+            <p class="fw-semibold mb-1">
+              {{ vehicle.current_mileage }} km
+            </p>
+
+            <a
+                href="{% url 'fleet:vehicle-mileage-update' pk=vehicle.pk %}"
+                class="btn btn-sm btn-outline-primary"
+            >
+              Update mileage
+            </a>
+          </div>
+
+          <div class="col-md-3">
+            <small class="text-muted">Fuel</small>
+            <p class="fw-semibold mb-0">
+              {{ vehicle.get_fuel_type_display }}
+            </p>
+          </div>
+
+          <div class="col-md-3">
+            <small class="text-muted">Status</small>
+            <p class="mb-0">
+              {% if vehicle.is_active %}
+                <span class="badge text-bg-success">Active</span>
+              {% else %}
+                <span class="badge text-bg-secondary">Inactive</span>
+              {% endif %}
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h4 mb-0">Maintenance plans</h2>
+
+      <a
+          href="{% url 'fleet:vehicle-maintenance-plan-create' vehicle_pk=vehicle.pk %}"
+          class="btn btn-sm btn-primary"
+      >
+        Add plan
+      </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-5">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+              <th class="px-4">Name</th>
+              <th>Mileage interval</th>
+              <th>Time interval</th>
+              <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for maintenance_plan in maintenance_plans %}
+              <tr>
+                <td class="px-4 fw-semibold">
+                  {{ maintenance_plan.name }}
+                </td>
+
+                <td>
+                  {% if maintenance_plan.mileage_interval %}
+                    {{ maintenance_plan.mileage_interval }} km
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+
+                <td>
+                  {% if maintenance_plan.time_interval_months %}
+                    {{ maintenance_plan.time_interval_months }} months
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+
+                <td class="text-end pe-4">
+                  <a
+                      href="{% url 'fleet:vehicle-maintenance-plan-update' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}"
+                      class="btn btn-sm btn-outline-primary"
+                  >
+                    Edit
+                  </a>
+
+                  <a
+                      href="{% url 'fleet:vehicle-maintenance-plan-delete' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}"
+                      class="btn btn-sm btn-outline-danger"
+                  >
+                    Delete
+                  </a>
+                </td>
+              </tr>
+
+            {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-4">
+                  No maintenance plans.
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h4 mb-0">Service records</h2>
+
+      <a
+          href="{% url 'fleet:vehicle-service-record-create' vehicle_pk=vehicle.pk %}"
+          class="btn btn-sm btn-primary"
+      >
+        Add service record
+      </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-5">
+      <div class="card-body p-0">
+
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th class="px-4">Service</th>
+            <th>Date</th>
+            <th>Mileage</th>
+            <th></th>
+          </tr>
+          </thead>
+
+          <tbody>
+          {% for service_record in service_records %}
+            <tr>
+              <td class="px-4 fw-semibold">
+                {{ service_record.name }}
+              </td>
+
+              <td>{{ service_record.date }}</td>
+
+              <td>{{ service_record.mileage }} km</td>
+
+              <td class="text-end pe-4">
+                <a
+                    href="{% url 'fleet:vehicle-service-record-update' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}"
+                    class="btn btn-sm btn-outline-primary"
+                >
+                  Edit
+                </a>
+
+                <a
+                    href="{% url 'fleet:vehicle-service-record-delete' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}"
+                    class="btn btn-sm btn-outline-danger"
+                >
+                  Delete
+                </a>
+              </td>
+            </tr>
+
+          {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">
+                No service records.
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h4 mb-0">Tires</h2>
+
+      <a
+          href="{% url 'fleet:vehicle-change-tires' vehicle_pk=vehicle.pk %}"
+          class="btn btn-sm btn-primary"
+      >
+        {% if current_tire_installation %}
+          Change tires
+        {% else %}
+          Install tires
+        {% endif %}
+      </a>
+    </div>
+
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+
+        <h3 class="h6 text-muted">Current tire set</h3>
+
+        {% if current_tire_installation %}
+          <p class="fw-semibold mb-1">
+            {{ current_tire_installation.tire_set }}
+          </p>
+
+          <p class="text-muted mb-0">
+            Installed at
+            {{ current_tire_installation.installed_at_mileage }} km
+          </p>
+        {% else %}
+          <p class="text-muted mb-0">
+            No tires installed.
+          </p>
+        {% endif %}
+
+      </div>
+    </div>
+
+
+    <h3 class="h5 mb-3">Tire history</h3>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th class="px-4">Tire set</th>
+            <th>Installed at</th>
+            <th>Removed at</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          {% for tire_installation in tire_installations %}
+            <tr>
+              <td class="px-4 fw-semibold">
+                {{ tire_installation.tire_set }}
+              </td>
+
+              <td>
+                {{ tire_installation.installed_at_mileage }} km
+              </td>
+
+              <td>
+                {{ tire_installation.removed_at_mileage }} km
+              </td>
+            </tr>
+
+          {% empty %}
+            <tr>
+              <td colspan="3" class="text-center text-muted py-4">
+                No tire history.
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
 {% endblock %}

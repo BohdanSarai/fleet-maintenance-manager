@@ -65,6 +65,9 @@ class MaintenancePlan(models.Model):
         on_delete=models.CASCADE,
     )
     name = models.CharField(max_length=255)
+    description = models.TextField(
+        blank=True,
+    )
     mileage_interval = models.PositiveIntegerField(blank=True, null=True)
     time_interval_months = models.PositiveIntegerField(blank=True, null=True)
     start_mileage = models.PositiveIntegerField(

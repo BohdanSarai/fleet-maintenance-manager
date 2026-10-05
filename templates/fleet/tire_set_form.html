@@ -6,11 +6,15 @@
 
     <div class="mb-4">
       {% if object %}
-        <h1 class="fw-bold">Edit service record</h1>
-        <p class="text-muted">Update maintenance record information</p>
+        <h1 class="fw-bold">Edit tire set</h1>
+        <p class="text-muted">
+          Update tire set information
+        </p>
       {% else %}
-        <h1 class="fw-bold">Add service record</h1>
-        <p class="text-muted">Record completed vehicle maintenance</p>
+        <h1 class="fw-bold">Add tire set</h1>
+        <p class="text-muted">
+          Add a new tire set to the fleet
+        </p>
       {% endif %}
     </div>
 
@@ -27,12 +31,12 @@
               {% if object %}
                 Save changes
               {% else %}
-                Add service record
+                Add tire set
               {% endif %}
             </button>
 
             <a
-                href="{% url 'fleet:vehicle-detail' pk=view.kwargs.vehicle_pk %}"
+                href="{% url 'fleet:tire-set-list' %}"
                 class="btn btn-outline-secondary"
             >
               Cancel

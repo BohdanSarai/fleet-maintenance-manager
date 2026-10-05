@@ -1,10 +1,54 @@
 {% extends "base.html" %}
+{% load crispy_forms_filters %}
 
 {% block content %}
-  <form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-  <input type="submit" value="Submit">
-  </form>
+  <div class="container-fluid">
 
+    <div class="mb-4">
+      {% if object %}
+        <h1 class="fw-bold">Edit maintenance plan</h1>
+        <p class="text-muted">Update maintenance schedule</p>
+      {% else %}
+        <h1 class="fw-bold">Add maintenance plan</h1>
+        <p class="text-muted">Create a maintenance schedule for the vehicle</p>
+      {% endif %}
+    </div>
+
+    <div class="row">
+      <div class="col-xl-8 col-lg-10">
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <form method="post">
+              {% csrf_token %}
+
+              {{ form|crispy }}
+
+              <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                  {% if object %}
+                    Save changes
+                  {% else %}
+                    Add plan
+                  {% endif %}
+                </button>
+
+                <a
+                    href="{% url 'fleet:vehicle-detail' pk=view.kwargs.vehicle_pk %}"
+                    class="btn btn-outline-secondary"
+                >
+                  Cancel
+                </a>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
 {% endblock %}

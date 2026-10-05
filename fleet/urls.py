@@ -19,6 +19,10 @@ from fleet.views import (
     EmployeeCreateView,
     EmployeeStatusUpdateView,
     EmployeeUpdateView,
+    VehicleMileageUpdateView,
+    TireSetListView,
+    TireSetCreateView,
+    TireSetUpdateView,
 )
 
 
@@ -29,7 +33,7 @@ urlpatterns = [
     path("vehicles/create/", VehicleCreateView.as_view(), name="vehicle-create"),
     path("vehicles/<int:pk>/update/", VehicleUpdateView.as_view(), name="vehicle-update"),
     path("vehicles/<int:pk>/delete/", VehicleDeleteView.as_view(), name="vehicle-delete"),
-    path("vehicles/<int:pk>/service-records/create/", ServiceRecordCreateView.as_view(), name="vehicle-service-record-create"),
+    path("vehicles/<int:vehicle_pk>/service-records/create/", ServiceRecordCreateView.as_view(), name="vehicle-service-record-create"),
     path("vehicles/<int:vehicle_pk>/service-record/<int:service_record_pk>/update/", ServiceRecordUpdateView.as_view(), name="vehicle-service-record-update"),
     path("vehicles/<int:vehicle_pk>/service-record/<int:service_record_pk>/delete/", ServiceRecordDeleteView.as_view(), name="vehicle-service-record-delete"),
     path("vehicles/<int:vehicle_pk>/maintenance-plan/create/", MaintenancePlanCreateView.as_view(), name="vehicle-maintenance-plan-create"),
@@ -61,6 +65,26 @@ urlpatterns = [
     EmployeeStatusUpdateView.as_view(),
     name="employee-status-update"
     ),
+    path(
+    "vehicles/<int:pk>/mileage/update/",
+    VehicleMileageUpdateView.as_view(),
+    name="vehicle-mileage-update",
+    ),
+    path(
+    "tire-sets/",
+    TireSetListView.as_view(),
+    name="tire-set-list",
+    ),
+    path(
+    "tire-sets/create/",
+    TireSetCreateView.as_view(),
+    name="tire-set-create",
+    ),
+    path(
+    "tire-sets/<int:pk>/update/",
+    TireSetUpdateView.as_view(),
+    name="tire-set-update",
+),
 ]
 
 

@@ -1,45 +1,131 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Employees</h1>
+  <div class="container-fluid">
 
-  {% for employee in employee_list %}
-    <p>
-      {{ employee.username }}
-      {{ employee.first_name }}
-      {{ employee.last_name }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="fw-bold mb-1">Employees</h1>
+        <p class="text-muted mb-0">
+          Manage company employees
+        </p>
+      </div>
 
-      {% if employee.is_active %}
-        Active
-      {% else %}
-        Inactive
-      {% endif %}
-
-      <a href="{% url 'fleet:employee-update' pk=employee.pk %}">
-        Update
+      <a
+          href="{% url 'fleet:employee-create' %}"
+          class="btn btn-primary"
+      >
+        Add employee
       </a>
-    </p>
+    </div>
 
-    <form
-        method="post"
-        action="{% url 'fleet:employee-status-update' pk=employee.pk %}"
-    >
-      {% csrf_token %}
 
-      {% if employee.is_active %}
-        <button type="submit">Deactivate</button>
-      {% else %}
-        <button type="submit">Activate</button>
-      {% endif %}
-    </form>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
 
-  {% empty %}
-    <p>No employees</p>
-  {% endfor %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
 
-  <a href="{% url 'fleet:employee-create' %}">
-    Create employee
-  </a>
+            <thead class="table-light">
+              <tr>
+                <th class="px-4">Username</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
 
-  {% include "includes/pagination.html" %}
+            <tbody>
+              {% for employee in employee_list %}
+                <tr>
+                  <td class="px-4 fw-semibold">
+                    {{ employee.username }}
+                  </td>
+
+                  <td>
+                    {{ employee.first_name }}
+                    {{ employee.last_name }}
+                  </td>
+
+                  <td>
+                    {% if employee.email %}
+                      {{ employee.email }}
+                    {% else %}
+                      —
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if employee.is_active %}
+                      <span class="badge text-bg-success">
+                        Active
+                      </span>
+                    {% else %}
+                      <span class="badge text-bg-secondary">
+                        Inactive
+                      </span>
+                    {% endif %}
+                  </td>
+
+                  <td class="text-end pe-4">
+
+                    <a
+                        href="{% url 'fleet:employee-update' pk=employee.pk %}"
+                        class="btn btn-sm btn-outline-primary"
+                    >
+                      Edit
+                    </a>
+
+                    <form
+                        method="post"
+                        action="{% url 'fleet:employee-status-update' pk=employee.pk %}"
+                        class="d-inline"
+                    >
+                      {% csrf_token %}
+
+                      {% if employee.is_active %}
+                        <button
+                            type="submit"
+                            class="btn btn-sm btn-outline-danger"
+                        >
+                          Deactivate
+                        </button>
+                      {% else %}
+                        <button
+                            type="submit"
+                            class="btn btn-sm btn-outline-success"
+                        >
+                          Activate
+                        </button>
+                      {% endif %}
+                    </form>
+
+                  </td>
+                </tr>
+
+              {% empty %}
+                <tr>
+                  <td
+                      colspan="5"
+                      class="text-center text-muted py-4"
+                  >
+                    No employees.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="mt-3">
+      {% include "includes/pagination.html" %}
+    </div>
+
+  </div>
 {% endblock %}
