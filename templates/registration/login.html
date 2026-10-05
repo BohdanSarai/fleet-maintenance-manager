@@ -1,11 +1,15 @@
 {% extends "base.html" %}
+{% load crispy_forms_filters %}
 
 {% block content %}
   <h1>Login</h1>
 
-  <form method="post">
+  <form method="post" style="max-width: 500px;">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
+    {{ form|crispy }}
+
+    <button type="submit" class="btn btn-primary">
+      Login
+    </button>
   </form>
 {% endblock %}
