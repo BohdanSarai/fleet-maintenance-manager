@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if object %}
+    <h1>Update employee</h1>
+  {% else %}
+    <h1>Create employee</h1>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% if object %}
+      <button type="submit">Update</button>
+    {% else %}
+      <button type="submit">Create</button>
+    {% endif %}
+  </form>
+{% endblock %}

@@ -128,3 +128,6 @@ MAILERS = {
 }
 
 AUTH_USER_MODEL = "fleet.CompanyUser"
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"

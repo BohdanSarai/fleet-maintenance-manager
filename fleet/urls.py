@@ -14,8 +14,11 @@ from fleet.views import (
     MaintenancePlanCreateView,
     MaintenancePlanUpdateView,
     MaintenancePlanDeleteView,
-    TireInstallationCreateView,
     ChangeTiresView,
+    EmployeeListView,
+    EmployeeCreateView,
+    EmployeeStatusUpdateView,
+    EmployeeUpdateView,
 )
 
 
@@ -33,11 +36,30 @@ urlpatterns = [
     path("vehicles/<int:vehicle_pk>/maintenance-plan/<int:maintenance_plan_pk>/update/", MaintenancePlanUpdateView.as_view(), name="vehicle-maintenance-plan-update"),
     path("vehicles/<int:vehicle_pk>/maintenance-plan/<int:maintenance_plan_pk>/delete/", MaintenancePlanDeleteView.as_view(),
          name="vehicle-maintenance-plan-delete"),
-    path("vehicles/<int:vehicle_pk>/tire-installations/create/", TireInstallationCreateView.as_view(), name="vehicle-tire-installation-create"),
     path(
         "vehicles/<int:vehicle_pk>/change-tires/",
         ChangeTiresView.as_view(),
         name="vehicle-change-tires",
+    ),
+    path(
+    "employees/",
+    EmployeeListView.as_view(),
+    name="employee-list"
+    ),
+    path(
+    "employees/create/",
+    EmployeeCreateView.as_view(),
+    name="employee-create",
+    ),
+    path(
+    "employees/<int:pk>/update/",
+    EmployeeUpdateView.as_view(),
+    name="employee-update",
+    ),
+    path(
+    "employees/<int:pk>/status/",
+    EmployeeStatusUpdateView.as_view(),
+    name="employee-status-update"
     ),
 ]
 

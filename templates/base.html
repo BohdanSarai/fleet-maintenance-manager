@@ -7,9 +7,15 @@
   {% endblock %}
 </head>
 <body>
-  {% block content %}
+{% if user.is_authenticated %}
+  {% include "includes/sidebar.html" %}
+{% endif %}
 
+<main>
+  {% block content %}
   {% endblock %}
+</main>
+
 
 </body>
 </html>

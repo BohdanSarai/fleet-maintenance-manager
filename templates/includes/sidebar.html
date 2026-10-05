@@ -1,0 +1,28 @@
+<nav>
+  <h3>Fleet Manager</h3>
+
+  <ul>
+    <li>
+      <a href="{% url 'fleet:index' %}">Dashboard</a>
+    </li>
+
+    <li>
+      <a href="{% url 'fleet:vehicle-list' %}">Vehicles</a>
+    </li>
+
+    {% if user.is_owner %}
+      <li>
+        <a href="{% url 'fleet:employee-list' %}">Employees</a>
+      </li>
+    {% endif %}
+  </ul>
+
+  {% if user.is_authenticated %}
+    <p>{{ user.username }}</p>
+
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
+  {% endif %}
+</nav>

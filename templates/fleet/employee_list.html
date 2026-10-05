@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Employees</h1>
+
+  {% for employee in employee_list %}
+    <p>
+      {{ employee.username }}
+      {{ employee.first_name }}
+      {{ employee.last_name }}
+
+      {% if employee.is_active %}
+        Active
+      {% else %}
+        Inactive
+      {% endif %}
+
+      <a href="{% url 'fleet:employee-update' pk=employee.pk %}">
+        Update
+      </a>
+    </p>
+
+    <form
+        method="post"
+        action="{% url 'fleet:employee-status-update' pk=employee.pk %}"
+    >
+      {% csrf_token %}
+
+      {% if employee.is_active %}
+        <button type="submit">Deactivate</button>
+      {% else %}
+        <button type="submit">Activate</button>
+      {% endif %}
+    </form>
+
+  {% empty %}
+    <p>No employees</p>
+  {% endfor %}
+
+  <a href="{% url 'fleet:employee-create' %}">
+    Create employee
+  </a>
+
+  {% include "includes/pagination.html" %}
+{% endblock %}
