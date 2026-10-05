@@ -91,7 +91,7 @@ class VehicleListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().order_by("id")
 
         form = VehicleSearchForm(self.request.GET)
 
@@ -332,8 +332,9 @@ class EmployeeListView(
         return self.request.user.is_owner
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(is_owner=False)
+        return super().get_queryset().filter(
+            is_owner=False
+        ).order_by("id")
 
 
 class EmployeeCreateView(
