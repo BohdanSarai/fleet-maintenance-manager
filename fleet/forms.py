@@ -1,7 +1,13 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-from fleet.models import TireSet, CompanyUser, Vehicle, MaintenancePlan, ServiceRecord
+from fleet.models import (
+    TireSet,
+    CompanyUser,
+    Vehicle,
+    MaintenancePlan,
+    ServiceRecord,
+)
 
 
 class ChangeTiresForm(forms.Form):
@@ -45,9 +51,7 @@ class VehicleMileageUpdateForm(forms.ModelForm):
     class Meta:
         model = Vehicle
         fields = ("current_mileage",)
-        labels = {
-            "current_mileage": "New mileage",
-        }
+        labels = {"current_mileage": "New mileage"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,12 +59,10 @@ class VehicleMileageUpdateForm(forms.ModelForm):
 
     def clean_current_mileage(self):
         new_mileage = self.cleaned_data["current_mileage"]
-
         if new_mileage < self.previous_mileage:
             raise forms.ValidationError(
                 "Mileage cannot be lower than the current mileage."
             )
-
         return new_mileage
 
 
@@ -77,6 +79,7 @@ class MaintenancePlanForm(forms.ModelForm):
         )
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
+            "start_date": forms.DateInput(attrs={"type": "date"}),
         }
 
 
@@ -142,4 +145,3 @@ class ServiceRecordSearchForm(forms.Form):
             }
         ),
     )
-

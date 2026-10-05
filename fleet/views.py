@@ -7,9 +7,25 @@ from django.utils import timezone
 
 from django.views import generic
 
-from .forms import ChangeTiresForm, VehicleSearchForm, EmployeeCreationForm, VehicleMileageUpdateForm, \
-    MaintenancePlanForm, ServiceRecordForm, TireSetForm, MaintenancePlanSearchForm, ServiceRecordSearchForm
-from .models import Vehicle, ServiceRecord, MaintenancePlan, TireInstallation, TireSet, CompanyUser
+from .forms import (
+    ChangeTiresForm,
+    EmployeeCreationForm,
+    MaintenancePlanForm,
+    MaintenancePlanSearchForm,
+    ServiceRecordForm,
+    ServiceRecordSearchForm,
+    TireSetForm,
+    VehicleMileageUpdateForm,
+    VehicleSearchForm,
+)
+from .models import (
+    CompanyUser,
+    MaintenancePlan,
+    ServiceRecord,
+    TireInstallation,
+    TireSet,
+    Vehicle,
+)
 
 
 class IndexView(LoginRequiredMixin, generic.TemplateView):
@@ -92,19 +108,15 @@ class VehicleListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset().order_by("id")
-
         form = VehicleSearchForm(self.request.GET)
-
         if form.is_valid():
             query = form.cleaned_data["query"]
-
             if query:
                 queryset = queryset.filter(
                     Q(brand__icontains=query)
                     | Q(model__icontains=query)
                     | Q(license_plate__icontains=query)
                 )
-
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -178,19 +190,14 @@ class ServiceRecordCreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-
         vehicle = Vehicle.objects.get(
             pk=self.kwargs["vehicle_pk"]
         )
-
         form.instance.vehicle = vehicle
-
         form.fields["maintenance_plan"].queryset = (
             MaintenancePlan.objects.filter(vehicle=vehicle)
         )
-
         form.fields["mileage"].initial = vehicle.current_mileage
-
         return form
 
     def form_valid(self, form):
@@ -208,11 +215,13 @@ class ServiceRecordUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = "fleet/service_record_form.html"
     pk_url_kwarg = "service_record_pk"
 
-    def get_form(self, form_class = None):
+    def get_form(self, form_class=None):
         form = super().get_form(form_class)
         vehicle = Vehicle.objects.get(pk=self.kwargs["vehicle_pk"])
         form.instance.vehicle = vehicle
-        form.fields["maintenance_plan"].queryset = MaintenancePlan.objects.filter(vehicle=vehicle)
+        form.fields["maintenance_plan"].queryset = (
+            MaintenancePlan.objects.filter(vehicle=vehicle)
+        )
         return form
 
     def get_success_url(self):
@@ -234,7 +243,6 @@ class MaintenancePlanCreateView(LoginRequiredMixin, generic.CreateView):
     model = MaintenancePlan
     form_class = MaintenancePlanForm
     template_name = "fleet/maintenance_plan_form.html"
-
 
     def form_valid(self, form):
         vehicle = Vehicle.objects.get(pk=self.kwargs["vehicle_pk"])
@@ -297,7 +305,9 @@ class ChangeTiresView(LoginRequiredMixin, generic.FormView):
             ).first()
 
             if current_installation:
-                current_installation.removed_at_mileage = vehicle.current_mileage
+                current_installation.removed_at_mileage = (
+                    vehicle.current_mileage
+                )
                 current_installation.save()
 
             new_installation = TireInstallation(
@@ -407,7 +417,6 @@ class VehicleMileageUpdateView(
         )
 
 
-
 class TireSetListView(LoginRequiredMixin, generic.ListView):
     model = TireSet
     context_object_name = "tire_set_list"
@@ -495,6 +504,3 @@ class ServiceRecordListView(LoginRequiredMixin, generic.ListView):
             initial={"query": self.request.GET.get("query", "")}
         )
         return context
-
-
-
