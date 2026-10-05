@@ -1,9 +1,10 @@
-from django.db.models import Model
-from django.template.base import kwarg_re
+from django.db import transaction
 from django.urls import reverse_lazy, reverse
 
 from django.views import generic
-from .models import Vehicle, ServiceRecord, MaintenancePlan
+
+from .forms import ChangeTiresForm
+from .models import Vehicle, ServiceRecord, MaintenancePlan, TireInstallation, TireSet
 
 
 class IndexView(generic.TemplateView):
@@ -22,6 +23,8 @@ class VehicleDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context["service_records"] = self.object.service_records.all()
         context["maintenance_plans"] = self.object.maintenance_plans.all()
+        context["tire_installations"] = self.object.tire_installations.filter(removed_at_mileage__isnull=False)
+        context["current_tire_installation"] = self.object.tire_installations.filter(removed_at_mileage__isnull=True).first()
         return context
 
 
@@ -141,5 +144,76 @@ class MaintenancePlanDeleteView(generic.DeleteView):
         return reverse("fleet:vehicle-detail", kwargs={"pk": pk})
 
 
+class TireInstallationCreateView(generic.CreateView):
+    model = TireInstallation
+    fields = ("tire_set", "installed_at_mileage", )
+    template_name = "fleet/tire_installation_form.html"
+
+    def get_form(self, form_class = None):
+        form = super().get_form(form_class)
+        vehicle = Vehicle.objects.get(pk=self.kwargs["vehicle_pk"])
+        form.instance.vehicle = vehicle
+        installed_tire_sets = TireInstallation.objects.filter(
+            removed_at_mileage__isnull=True
+        ).values_list("tire_set_id", flat=True)
+        form.fields["tire_set"].queryset = TireSet.objects.exclude(
+            pk__in=installed_tire_sets
+        )
+        return form
+
+    def get_success_url(self):
+        pk = self.kwargs["vehicle_pk"]
+        return reverse("fleet:vehicle-detail", kwargs={"pk": pk})
+
+
+class ChangeTiresView(generic.FormView):
+    form_class = ChangeTiresForm
+    template_name = "fleet/change_tires_form.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        installed_tire_sets = TireInstallation.objects.filter(
+            removed_at_mileage__isnull=True
+        ).values_list("tire_set_id", flat=True)
+
+        available_tire_sets = TireSet.objects.exclude(
+            pk__in=installed_tire_sets
+        )
+
+        kwargs["tire_sets"] = available_tire_sets
+
+        return kwargs
+
+    def form_valid(self, form):
+        vehicle = Vehicle.objects.get(pk=self.kwargs["vehicle_pk"])
+        new_tire_set = form.cleaned_data["tire_set"]
+
+        with transaction.atomic():
+            current_installation = TireInstallation.objects.filter(
+                vehicle=vehicle,
+                removed_at_mileage__isnull=True
+            ).first()
+
+            if current_installation:
+                current_installation.removed_at_mileage = vehicle.current_mileage
+                current_installation.save()
+
+            new_installation = TireInstallation(
+                vehicle=vehicle,
+                tire_set=new_tire_set,
+                installed_at_mileage=vehicle.current_mileage,
+            )
+
+            new_installation.full_clean()
+            new_installation.save()
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "fleet:vehicle-detail",
+            kwargs={"pk": self.kwargs["vehicle_pk"]}
+        )
 
 

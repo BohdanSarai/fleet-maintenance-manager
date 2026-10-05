@@ -13,8 +13,12 @@
     <p>{{ maintenance_plan.name }}</p>
     <p>{{ maintenance_plan.mileage_interval }}</p>
     <p>{{ maintenance_plan.time_interval_months }}</p>
-    <p><a href="{% url 'fleet:vehicle-maintenance-plan-update' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}">Update</a></p>
-    <p><a href="{% url 'fleet:vehicle-maintenance-plan-delete' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}">Delete</a></p>
+    <p><a
+        href="{% url 'fleet:vehicle-maintenance-plan-update' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}">Update</a>
+    </p>
+    <p><a
+        href="{% url 'fleet:vehicle-maintenance-plan-delete' vehicle_pk=vehicle.pk maintenance_plan_pk=maintenance_plan.pk %}">Delete</a>
+    </p>
     <p>__________________________________________</p>
   {% endfor %}
 
@@ -24,13 +28,44 @@
     <p>{{ service_record.name }}</p>
     <p>{{ service_record.date }}</p>
     <p>{{ service_record.mileage }}</p>
-    <p><a href="{% url 'fleet:vehicle-service-record-update' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}">Update</a></p>
-    <p><a href="{% url 'fleet:vehicle-service-record-delete' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}">Delete</a></p>
+    <p><a
+        href="{% url 'fleet:vehicle-service-record-update' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}">Update</a>
+    </p>
+    <p><a
+        href="{% url 'fleet:vehicle-service-record-delete' vehicle_pk=vehicle.pk service_record_pk=service_record.pk %}">Delete</a>
+    </p>
     <p>__________________________________</p>
   {% endfor %}
 
+  <h3>Current tires</h3>
+
+  {% if current_tire_installation %}
+    <p>{{ current_tire_installation.tire_set }}</p>
+    <p>{{ current_tire_installation.installed_at_mileage }}</p>
+  {% else %}
+    <p>No tires installed</p>
+  {% endif %}
+
+  <h3>Tire history</h3>
+
+  {% for tire_installation in tire_installations %}
+    <p>{{ tire_installation.tire_set }}</p>
+    <p>{{ tire_installation.installed_at_mileage }}</p>
+    <p>{{ tire_installation.removed_at_mileage }}</p>
+  {% empty %}
+    <p>No tire history</p>
+  {% endfor %}
 
 
+  {% if current_tire_installation %}
+    <a href="{% url 'fleet:vehicle-change-tires' vehicle_pk=vehicle.pk %}">
+      Change tires
+    </a>
+  {% else %}
+    <a href="{% url 'fleet:vehicle-tire-installation-create' vehicle_pk=vehicle.pk %}">
+      Install tire set
+    </a>
+  {% endif %}
   <h3><a href="{% url 'fleet:vehicle-maintenance-plan-create' vehicle_pk=vehicle.pk %}">Create maintenance plan</a></h3>
   <h3><a href="{% url 'fleet:vehicle-service-record-create' pk=vehicle.pk %}">Create service record</a></h3>
 
