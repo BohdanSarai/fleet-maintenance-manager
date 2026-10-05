@@ -1,5 +1,56 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Hello</h1>
+  <h1>Dashboard</h1>
+
+  <h2>Overview</h2>
+
+  <p>Active vehicles: {{ active_vehicles_count }}</p>
+  <p>Active employees: {{ active_employees_count }}</p>
+  <p>Service records: {{ service_records_count }}</p>
+  <p>Tire sets: {{ tire_sets_count }}</p>
+
+  <h2>Maintenance reminders</h2>
+
+  {% for reminder in maintenance_reminders %}
+    <div>
+      <h3>
+        {{ reminder.plan.vehicle.brand }}
+        {{ reminder.plan.vehicle.model }}
+        — {{ reminder.plan.name }}
+      </h3>
+
+      {% if reminder.mileage_left is not None %}
+        {% if reminder.overdue_mileage %}
+          <p>
+            Mileage: OVERDUE by
+            {{ reminder.overdue_mileage }} km
+          </p>
+        {% elif reminder.mileage_left == 0 %}
+          <p>Mileage: DUE NOW</p>
+        {% else %}
+          <p>
+            Mileage: due in {{ reminder.mileage_left }} km
+          </p>
+        {% endif %}
+      {% endif %}
+
+      {% if reminder.days_left is not None %}
+        {% if reminder.overdue_days %}
+          <p>
+            Date: OVERDUE by
+            {{ reminder.overdue_days }} days
+          </p>
+        {% elif reminder.days_left == 0 %}
+          <p>Date: DUE TODAY</p>
+        {% else %}
+          <p>
+            Date: due in {{ reminder.days_left }} days
+          </p>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>No upcoming maintenance.</p>
+  {% endfor %}
 {% endblock %}

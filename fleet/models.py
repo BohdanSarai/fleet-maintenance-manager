@@ -1,7 +1,27 @@
+import calendar
+from datetime import date
+
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+
+
+def add_months(source_date: date, months: int) -> date:
+    month = source_date.month - 1 + months
+    year = source_date.year + month // 12
+    month = month % 12 + 1
+
+    day = min(
+        source_date.day,
+        calendar.monthrange(year, month)[1]
+    )
+
+    return source_date.replace(
+        year=year,
+        month=month,
+        day=day,
+    )
 
 
 class CompanyUser(AbstractUser):
@@ -47,6 +67,14 @@ class MaintenancePlan(models.Model):
     name = models.CharField(max_length=255)
     mileage_interval = models.PositiveIntegerField(blank=True, null=True)
     time_interval_months = models.PositiveIntegerField(blank=True, null=True)
+    start_mileage = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+    )
+    start_date = models.DateField(
+        null=True,
+        blank=True,
+    )
 
     def clean(self):
         if not self.mileage_interval and not self.time_interval_months:
@@ -54,6 +82,41 @@ class MaintenancePlan(models.Model):
 
     def __str__(self):
         return f"{self.vehicle.brand} {self.vehicle.model} - {self.name}"
+
+    def get_next_service_mileage(self):
+        if self.mileage_interval is None:
+            return None
+
+        last_service = self.service_records.order_by("-mileage").first()
+
+        if last_service:
+            base_mileage = last_service.mileage
+        else:
+            base_mileage = self.start_mileage
+
+        if base_mileage is None:
+            return None
+
+        return base_mileage + self.mileage_interval
+
+    def get_next_service_date(self):
+        if self.time_interval_months is None:
+            return None
+
+        last_service = self.service_records.order_by("-date").first()
+
+        if last_service:
+            base_date = last_service.date
+        else:
+            base_date = self.start_date
+
+        if base_date is None:
+            return None
+
+        return add_months(
+            base_date,
+            self.time_interval_months,
+        )
 
 
 class ServiceRecord(models.Model):

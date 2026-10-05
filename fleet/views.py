@@ -3,6 +3,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
+from django.utils import timezone
 
 from django.views import generic
 
@@ -12,6 +13,75 @@ from .models import Vehicle, ServiceRecord, MaintenancePlan, TireInstallation, T
 
 class IndexView(LoginRequiredMixin, generic.TemplateView):
     template_name = "fleet/index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        maintenance_reminders = []
+        today = timezone.localdate()
+
+        plans = MaintenancePlan.objects.select_related("vehicle")
+
+        for plan in plans:
+            next_mileage = plan.get_next_service_mileage()
+            next_date = plan.get_next_service_date()
+
+            mileage_left = None
+            days_left = None
+
+            if next_mileage is not None:
+                mileage_left = (
+                    next_mileage - plan.vehicle.current_mileage
+                )
+
+            if next_date is not None:
+                days_left = (next_date - today).days
+
+            mileage_due = (
+                mileage_left is not None
+                and mileage_left <= 1000
+            )
+
+            date_due = (
+                days_left is not None
+                and days_left <= 30
+            )
+
+            if mileage_due or date_due:
+                maintenance_reminders.append({
+                    "plan": plan,
+                    "next_mileage": next_mileage,
+                    "next_date": next_date,
+                    "mileage_left": mileage_left,
+                    "days_left": days_left,
+                    "overdue_mileage": (
+                        abs(mileage_left)
+                        if mileage_left is not None and mileage_left < 0
+                        else None
+                    ),
+                    "overdue_days": (
+                        abs(days_left)
+                        if days_left is not None and days_left < 0
+                        else None
+                    ),
+                })
+
+        context["maintenance_reminders"] = maintenance_reminders
+
+        context["active_vehicles_count"] = Vehicle.objects.filter(
+            is_active=True
+        ).count()
+
+        context["active_employees_count"] = CompanyUser.objects.filter(
+            is_owner=False,
+            is_active=True,
+        ).count()
+
+        context["service_records_count"] = ServiceRecord.objects.count()
+
+        context["tire_sets_count"] = TireSet.objects.count()
+
+        return context
 
 
 class VehicleListView(LoginRequiredMixin, generic.ListView):
@@ -137,7 +207,7 @@ class ServiceRecordDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class MaintenancePlanCreateView(LoginRequiredMixin, generic.CreateView):
     model = MaintenancePlan
-    fields = ("name", "mileage_interval", "time_interval_months", )
+    fields = ("name", "mileage_interval", "time_interval_months", "start_mileage", "start_date", )
     template_name = "fleet/maintenance_plan_form.html"
 
 
@@ -153,7 +223,7 @@ class MaintenancePlanCreateView(LoginRequiredMixin, generic.CreateView):
 
 class MaintenancePlanUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = MaintenancePlan
-    fields = ("name", "mileage_interval", "time_interval_months", )
+    fields = ("name", "mileage_interval", "time_interval_months",  "start_mileage", "start_date", )
     pk_url_kwarg = "maintenance_plan_pk"
     template_name = "fleet/maintenance_plan_form.html"
 
