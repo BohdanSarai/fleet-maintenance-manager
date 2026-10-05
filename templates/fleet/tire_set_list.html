@@ -20,49 +20,69 @@
   <div class="card border-0 shadow-sm">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
-        <tr>
-          <th>Manufacturer</th>
-          <th>Model</th>
-          <th>Season</th>
-          <th>Size</th>
-          <th>Max mileage</th>
-          <th></th>
-        </tr>
+      <tr>
+        <th>Manufacturer</th>
+        <th>Model</th>
+        <th>Season</th>
+        <th>Size</th>
+        <th>Max mileage</th>
+        <th>Tracked mileage</th>
+        <th>Total mileage</th>
+        <th>Remaining</th>
+        <th></th>
+      </tr>
       </thead>
 
       <tbody>
-        {% for tire_set in tire_set_list %}
-          <tr>
-            <td>{{ tire_set.manufacturer }}</td>
-            <td>{{ tire_set.model }}</td>
-            <td>{{ tire_set.get_season_display }}</td>
-            <td>{{ tire_set.size }}</td>
+      {% for tire_set in tire_set_list %}
+        <tr>
+          <td>{{ tire_set.manufacturer }}</td>
+          <td>{{ tire_set.model }}</td>
+          <td>{{ tire_set.get_season_display }}</td>
+          <td>{{ tire_set.size }}</td>
 
-            <td>
-              {% if tire_set.max_mileage %}
-                {{ tire_set.max_mileage }} km
-              {% else %}
-                —
-              {% endif %}
-            </td>
+          <td>
+            {% if tire_set.max_mileage %}
+              {{ tire_set.max_mileage }} km
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>
+            {{ tire_set.get_tracked_mileage }} km
+          </td>
 
-            <td class="text-end">
-              <a
-                  href="{% url 'fleet:tire-set-update' pk=tire_set.pk %}"
-                  class="btn btn-sm btn-outline-primary"
-              >
-                Edit
-              </a>
-            </td>
-          </tr>
+          <td>
+            {% if tire_set.get_total_mileage is not None %}
+              {{ tire_set.get_total_mileage }} km
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>
+            {% if tire_set.get_remaining_mileage is not None %}
+              {{ tire_set.get_remaining_mileage }} km
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <a
+                href="{% url 'fleet:tire-set-update' pk=tire_set.pk %}"
+                class="btn btn-sm btn-outline-primary"
+            >
+              Edit
+            </a>
+          </td>
+        </tr>
 
-        {% empty %}
-          <tr>
-            <td colspan="6" class="text-center text-muted py-4">
-              No tire sets.
-            </td>
-          </tr>
-        {% endfor %}
+      {% empty %}
+        <tr>
+          <td colspan="9" class="text-center text-muted py-4">
+            No tire sets.
+          </td>
+        </tr>
+      {% endfor %}
       </tbody>
     </table>
   </div>

@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.views import generic
 
 from .forms import ChangeTiresForm, VehicleSearchForm, EmployeeCreationForm, VehicleMileageUpdateForm, \
-    MaintenancePlanForm, ServiceRecordForm, TireSetForm
+    MaintenancePlanForm, ServiceRecordForm, TireSetForm, MaintenancePlanSearchForm, ServiceRecordSearchForm
 from .models import Vehicle, ServiceRecord, MaintenancePlan, TireInstallation, TireSet, CompanyUser
 
 
@@ -120,10 +120,22 @@ class VehicleDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["service_records"] = self.object.service_records.all()
+        context["service_records"] = (
+            self.object.service_records
+            .select_related("maintenance_plan", "created_by")
+        )
         context["maintenance_plans"] = self.object.maintenance_plans.all()
-        context["tire_installations"] = self.object.tire_installations.filter(removed_at_mileage__isnull=False)
-        context["current_tire_installation"] = self.object.tire_installations.filter(removed_at_mileage__isnull=True).first()
+        context["tire_installations"] = (
+            self.object.tire_installations
+            .filter(removed_at_mileage__isnull=False)
+            .select_related("tire_set")
+        )
+        context["current_tire_installation"] = (
+            self.object.tire_installations
+            .filter(removed_at_mileage__isnull=True)
+            .select_related("tire_set")
+            .first()
+        )
         return context
 
 
@@ -400,6 +412,11 @@ class TireSetListView(LoginRequiredMixin, generic.ListView):
     context_object_name = "tire_set_list"
     template_name = "fleet/tire_set_list.html"
 
+    def get_queryset(self):
+        return TireSet.objects.prefetch_related(
+            "tire_installations__vehicle"
+        )
+
 
 class TireSetCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = TireSetForm
@@ -412,5 +429,71 @@ class TireSetUpdateView(LoginRequiredMixin, generic.UpdateView):
     form_class = TireSetForm
     template_name = "fleet/tire_set_form.html"
     success_url = reverse_lazy("fleet:tire-set-list")
+
+
+class MaintenancePlanListView(LoginRequiredMixin, generic.ListView):
+    model = MaintenancePlan
+    context_object_name = "maintenance_plan_list"
+    template_name = "fleet/maintenance_plan_list.html"
+
+    def get_queryset(self):
+        queryset = MaintenancePlan.objects.select_related("vehicle")
+        form = MaintenancePlanSearchForm(self.request.GET)
+
+        if form.is_valid():
+            query = form.cleaned_data["query"]
+
+            if query:
+                queryset = queryset.filter(
+                    Q(name__icontains=query)
+                    | Q(vehicle__brand__icontains=query)
+                    | Q(vehicle__model__icontains=query)
+                    | Q(vehicle__license_plate__icontains=query)
+                )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_form"] = MaintenancePlanSearchForm(
+            initial={"query": self.request.GET.get("query", "")}
+        )
+        return context
+
+
+class ServiceRecordListView(LoginRequiredMixin, generic.ListView):
+    model = ServiceRecord
+    context_object_name = "service_record_list"
+    template_name = "fleet/service_record_list.html"
+
+    def get_queryset(self):
+        queryset = ServiceRecord.objects.select_related(
+            "vehicle",
+            "maintenance_plan",
+            "created_by",
+        ).order_by("-date")
+
+        form = ServiceRecordSearchForm(self.request.GET)
+
+        if form.is_valid():
+            query = form.cleaned_data["query"]
+
+            if query:
+                queryset = queryset.filter(
+                    Q(name__icontains=query)
+                    | Q(vehicle__brand__icontains=query)
+                    | Q(vehicle__model__icontains=query)
+                    | Q(vehicle__license_plate__icontains=query)
+                )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_form"] = ServiceRecordSearchForm(
+            initial={"query": self.request.GET.get("query", "")}
+        )
+        return context
+
 
 

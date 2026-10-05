@@ -1,12 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Delete Vehicle</h1>
+  <h1>Delete vehicle</h1>
 
-  <p>Are you sure you want to delete the vehicle: {{ vehicle }}?</p>
+  <p>
+    Are you sure you want to delete
+    <strong>{{ vehicle.brand }} {{ vehicle.model }}</strong>?
+  </p>
 
-  <form action="" method="post">
+  <form method="post">
     {% csrf_token %}
-    <input type="submit" value="Yes, delete" class="btn btn-danger">
+    <button type="submit" class="btn btn-danger">
+      Yes, delete
+    </button>
+
+    <a
+        href="{% url 'fleet:vehicle-detail' pk=vehicle.pk %}"
+        class="btn btn-secondary"
+    >
+      Cancel
+    </a>
   </form>
 {% endblock %}

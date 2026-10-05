@@ -174,6 +174,37 @@ class TireSet(models.Model):
     def __str__(self):
         return f"{self.manufacturer} {self.model} {self.size}"
 
+    def get_tracked_mileage(self) -> int:
+        mileage = 0
+
+        for installation in self.tire_installations.all():
+            if installation.removed_at_mileage is not None:
+                mileage += (
+                        installation.removed_at_mileage
+                        - installation.installed_at_mileage
+                )
+            else:
+                mileage += (
+                        installation.vehicle.current_mileage
+                        - installation.installed_at_mileage
+                )
+
+        return mileage
+
+    def get_total_mileage(self) -> int | None:
+        if self.initial_mileage is None:
+            return None
+
+        return self.initial_mileage + self.get_tracked_mileage()
+
+    def get_remaining_mileage(self) -> int | None:
+        total_mileage = self.get_total_mileage()
+
+        if self.max_mileage is None or total_mileage is None:
+            return None
+
+        return self.max_mileage - total_mileage
+
 
 class TireInstallation(models.Model):
     vehicle = models.ForeignKey(

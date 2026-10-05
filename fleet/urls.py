@@ -23,6 +23,8 @@ from fleet.views import (
     TireSetListView,
     TireSetCreateView,
     TireSetUpdateView,
+    MaintenancePlanListView,
+    ServiceRecordListView,
 )
 
 
@@ -84,7 +86,17 @@ urlpatterns = [
     "tire-sets/<int:pk>/update/",
     TireSetUpdateView.as_view(),
     name="tire-set-update",
-),
+    ),
+    path(
+    "maintenance-plans/",
+    MaintenancePlanListView.as_view(),
+    name="maintenance-plan-list",
+    ),
+    path(
+    "service-records/",
+    ServiceRecordListView.as_view(),
+    name="service-record-list",
+    ),
 ]
 
 

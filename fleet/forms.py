@@ -49,12 +49,16 @@ class VehicleMileageUpdateForm(forms.ModelForm):
             "current_mileage": "New mileage",
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.previous_mileage = self.instance.current_mileage
+
     def clean_current_mileage(self):
         new_mileage = self.cleaned_data["current_mileage"]
 
-        if new_mileage < self.instance.current_mileage:
+        if new_mileage < self.previous_mileage:
             raise forms.ValidationError(
-                "New mileage cannot be less than current mileage."
+                "Mileage cannot be lower than the current mileage."
             )
 
         return new_mileage
@@ -111,4 +115,31 @@ class TireSetForm(forms.ModelForm):
             ),
         }
 
+
+class MaintenancePlanSearchForm(forms.Form):
+    query = forms.CharField(
+        max_length=255,
+        required=False,
+        label="",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Search maintenance plans",
+            }
+        ),
+    )
+
+
+class ServiceRecordSearchForm(forms.Form):
+    query = forms.CharField(
+        max_length=255,
+        required=False,
+        label="",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Search service history",
+            }
+        ),
+    )
 
