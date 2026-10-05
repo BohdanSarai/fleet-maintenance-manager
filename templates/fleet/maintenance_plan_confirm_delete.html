@@ -5,17 +5,16 @@
 
   <p>
     Are you sure you want to delete
-    <strong>{{ maintenance_plan.name }}</strong>?
+    <strong>{{ object.name }}</strong>?
   </p>
 
   <form method="post">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">
+    <button class="btn btn-danger" type="submit">
       Yes, delete
     </button>
-
     <a
-        href="{% url 'fleet:vehicle-detail' pk=maintenance_plan.vehicle.pk %}"
+        href="{% url 'fleet:vehicle-detail' pk=object.vehicle.pk %}"
         class="btn btn-secondary"
     >
       Cancel
