@@ -1,16 +1,147 @@
-from  django.urls import path
-from fleet.views import (
-    IndexView,
-    VehicleListView,
-    VehicleDetailView,
-)
+from django.urls import path
 
+from fleet.views import (
+    ChangeTiresView,
+    EmployeeCreateView,
+    EmployeeListView,
+    EmployeeStatusUpdateView,
+    EmployeeUpdateView,
+    IndexView,
+    MaintenancePlanCreateView,
+    MaintenancePlanDeleteView,
+    MaintenancePlanListView,
+    MaintenancePlanUpdateView,
+    ServiceRecordCreateView,
+    ServiceRecordDeleteView,
+    ServiceRecordListView,
+    ServiceRecordUpdateView,
+    TireSetCreateView,
+    TireSetListView,
+    TireSetUpdateView,
+    VehicleCreateView,
+    VehicleDeleteView,
+    VehicleDetailView,
+    VehicleListView,
+    VehicleMileageUpdateView,
+    VehicleUpdateView,
+)
 
 urlpatterns = [
     path("", IndexView.as_view(), name="index"),
-    path("vehicles/", VehicleListView.as_view(), name="vehicle-list"),
-    path("vehicles/<int:pk>/", VehicleDetailView.as_view(), name="vehicle-detail"),
+    path(
+        "vehicles/",
+        VehicleListView.as_view(),
+        name="vehicle-list",
+    ),
+    path(
+        "vehicles/<int:pk>/",
+        VehicleDetailView.as_view(),
+        name="vehicle-detail",
+    ),
+    path(
+        "vehicles/create/",
+        VehicleCreateView.as_view(),
+        name="vehicle-create",
+    ),
+    path(
+        "vehicles/<int:pk>/update/",
+        VehicleUpdateView.as_view(),
+        name="vehicle-update",
+    ),
+    path(
+        "vehicles/<int:pk>/delete/",
+        VehicleDeleteView.as_view(),
+        name="vehicle-delete",
+    ),
+    path(
+        "vehicles/<int:vehicle_pk>/service-records/create/",
+        ServiceRecordCreateView.as_view(),
+        name="vehicle-service-record-create",
+    ),
+    path(
+        "vehicles/<int:vehicle_pk>/service-record/"
+        "<int:service_record_pk>/update/",
+        ServiceRecordUpdateView.as_view(),
+        name="vehicle-service-record-update",
+    ),
+    path(
+        "vehicles/<int:vehicle_pk>/service-record/"
+        "<int:service_record_pk>/delete/",
+        ServiceRecordDeleteView.as_view(),
+        name="vehicle-service-record-delete",
+    ),
+    path(
+        "vehicles/<int:vehicle_pk>/maintenance-plan/create/",
+        MaintenancePlanCreateView.as_view(),
+        name="vehicle-maintenance-plan-create",
+    ),
+    path(
+        "vehicles/<int:vehicle_pk>/maintenance-plan/"
+        "<int:maintenance_plan_pk>/update/",
+        MaintenancePlanUpdateView.as_view(),
+        name="vehicle-maintenance-plan-update",
+    ),
+    path(
+        "vehicles/<int:vehicle_pk>/maintenance-plan/"
+        "<int:maintenance_plan_pk>/delete/",
+        MaintenancePlanDeleteView.as_view(),
+        name="vehicle-maintenance-plan-delete",
+    ),
+    path(
+        "vehicles/<int:vehicle_pk>/change-tires/",
+        ChangeTiresView.as_view(),
+        name="vehicle-change-tires",
+    ),
+    path(
+        "vehicles/<int:pk>/mileage/update/",
+        VehicleMileageUpdateView.as_view(),
+        name="vehicle-mileage-update",
+    ),
+    path(
+        "employees/",
+        EmployeeListView.as_view(),
+        name="employee-list",
+    ),
+    path(
+        "employees/create/",
+        EmployeeCreateView.as_view(),
+        name="employee-create",
+    ),
+    path(
+        "employees/<int:pk>/update/",
+        EmployeeUpdateView.as_view(),
+        name="employee-update",
+    ),
+    path(
+        "employees/<int:pk>/status/",
+        EmployeeStatusUpdateView.as_view(),
+        name="employee-status-update",
+    ),
+    path(
+        "tire-sets/",
+        TireSetListView.as_view(),
+        name="tire-set-list",
+    ),
+    path(
+        "tire-sets/create/",
+        TireSetCreateView.as_view(),
+        name="tire-set-create",
+    ),
+    path(
+        "tire-sets/<int:pk>/update/",
+        TireSetUpdateView.as_view(),
+        name="tire-set-update",
+    ),
+    path(
+        "maintenance-plans/",
+        MaintenancePlanListView.as_view(),
+        name="maintenance-plan-list",
+    ),
+    path(
+        "service-records/",
+        ServiceRecordListView.as_view(),
+        name="service-record-list",
+    ),
 ]
-
 
 app_name = "fleet"

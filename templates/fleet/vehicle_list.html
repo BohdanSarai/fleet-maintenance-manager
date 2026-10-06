@@ -1,11 +1,137 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <ul>
-  {% for vehicle in vehicle_list %}
-    <li><a href="{% url 'fleet:vehicle-detail' pk=vehicle.pk %}">{{ vehicle.brand }} {{ vehicle.model }}</a></li>
+  <div class="container-fluid">
 
-  {% endfor %}
-  </ul>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="fw-bold mb-1">Vehicles</h1>
+        <p class="text-muted mb-0">
+          Manage company vehicles
+        </p>
+      </div>
 
+      <a
+          href="{% url 'fleet:vehicle-create' %}"
+          class="btn btn-primary"
+      >
+        Add vehicle
+      </a>
+    </div>
+
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+
+        <form method="get" class="d-flex gap-2">
+          <div class="flex-grow-1">
+            {{ search_form.query }}
+          </div>
+
+          <button
+              type="submit"
+              class="btn btn-outline-primary"
+          >
+            Search
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+
+            <thead class="table-light">
+            <tr>
+              <th class="px-4">Vehicle</th>
+              <th>Year</th>
+              <th>License plate</th>
+              <th>Fuel</th>
+              <th>Mileage</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for vehicle in vehicle_list %}
+              <tr>
+                <td class="px-4 fw-semibold">
+                  {{ vehicle.brand }} {{ vehicle.model }}
+                </td>
+
+                <td>
+                  {{ vehicle.year }}
+                </td>
+
+                <td>
+                  {{ vehicle.license_plate }}
+                </td>
+
+                <td>
+                  {{ vehicle.get_fuel_type_display }}
+                </td>
+
+                <td>
+                  {{ vehicle.current_mileage }} km
+
+                  <a
+                      href="{% url 'fleet:vehicle-mileage-update' pk=vehicle.pk %}"
+                      class="btn btn-sm btn-outline-primary ms-2"
+                  >
+                    Update
+                  </a>
+                </td>
+
+                <td>
+                  {% if vehicle.is_active %}
+                    <span class="badge text-bg-success">
+                        Active
+                      </span>
+                  {% else %}
+                    <span class="badge text-bg-secondary">
+                        Inactive
+                      </span>
+                  {% endif %}
+                </td>
+
+                <td class="text-end pe-4">
+                  <a
+                      href="{% url 'fleet:vehicle-detail' pk=vehicle.pk %}"
+                      class="btn btn-sm btn-outline-primary"
+                  >
+                    View
+                  </a>
+                </td>
+              </tr>
+
+            {% empty %}
+              <tr>
+                <td
+                    colspan="7"
+                    class="text-center text-muted py-4"
+                >
+                  No vehicles found.
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="mt-3">
+      {% include "includes/pagination.html" %}
+    </div>
+
+  </div>
 {% endblock %}

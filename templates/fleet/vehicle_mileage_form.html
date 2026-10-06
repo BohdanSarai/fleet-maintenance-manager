@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+  <div class="container-fluid">
+
+    <div class="mb-4">
+      <h1 class="fw-bold">Update mileage</h1>
+      <p class="text-muted">
+        {{ object.brand }} {{ object.model }}
+      </p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6">
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <form method="post">
+              {% csrf_token %}
+
+              <p>
+                Current mileage:
+                <strong>{{ object.current_mileage }} km</strong>
+              </p>
+
+              {{ form|crispy }}
+
+              <button type="submit" class="btn btn-primary">
+                Update mileage
+              </button>
+
+              <a
+                  href="{% url 'fleet:vehicle-detail' pk=object.pk %}"
+                  class="btn btn-outline-secondary"
+              >
+                Cancel
+              </a>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

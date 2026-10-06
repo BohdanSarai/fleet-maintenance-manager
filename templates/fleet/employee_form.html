@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+  <div style="max-width: 900px;">
+    <div class="mb-4">
+      {% if object %}
+        <h1 class="fw-bold">Update employee</h1>
+        <p class="text-muted">Update employee information</p>
+      {% else %}
+        <h1 class="fw-bold">Add employee</h1>
+        <p class="text-muted">Create a new fleet employee</p>
+      {% endif %}
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          {{ form|crispy }}
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-primary">
+              {% if object %}Save changes{% else %}Add employee{% endif %}
+            </button>
+
+            <a
+                href="{% url 'fleet:employee-list' %}"
+                class="btn btn-outline-secondary"
+            >
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -23,6 +23,7 @@ class CompanyUserAdmin(UserAdmin):
         ),
     )
 
+
 admin.site.register(Vehicle)
 admin.site.register(MaintenancePlan)
 admin.site.register(ServiceRecord)

@@ -1,0 +1,12 @@
+[flake8]
+inline-quotes = double
+exclude =
+    .venv,
+    migrations,
+    manage.py,
+    __init__.py,
+    asgi.py,
+    wsgi.py
+per-file-ignores =
+    fleet_manager/settings/development.py:F403,F405
+    fleet_manager/settings/production.py:F403,F405

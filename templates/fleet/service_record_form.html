@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+  <div style="max-width: 900px;">
+
+    <div class="mb-4">
+      {% if object %}
+        <h1 class="fw-bold">Edit service record</h1>
+        <p class="text-muted">Update maintenance record information</p>
+      {% else %}
+        <h1 class="fw-bold">Add service record</h1>
+        <p class="text-muted">Record completed vehicle maintenance</p>
+      {% endif %}
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+
+        <form method="post">
+          {% csrf_token %}
+
+          {{ form|crispy }}
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-primary">
+              {% if object %}
+                Save changes
+              {% else %}
+                Add service record
+              {% endif %}
+            </button>
+
+            <a
+                href="{% url 'fleet:vehicle-detail' pk=view.kwargs.vehicle_pk %}"
+                class="btn btn-outline-secondary"
+            >
+              Cancel
+            </a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

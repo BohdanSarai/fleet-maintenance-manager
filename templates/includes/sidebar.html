@@ -1,0 +1,83 @@
+<nav
+    class="d-flex flex-column flex-shrink-0 p-3
+           bg-dark text-white position-sticky top-0 vh-100"
+    style="width: 250px;"
+>
+  <h4 class="mb-4">
+    Fleet Manager
+  </h4>
+
+  <ul class="nav nav-pills flex-column gap-2">
+
+    <li class="nav-item">
+      <a
+          href="{% url 'fleet:index' %}"
+          class="nav-link text-white"
+      >
+        Dashboard
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+          href="{% url 'fleet:vehicle-list' %}"
+          class="nav-link text-white"
+      >
+        Vehicles
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'fleet:maintenance-plan-list' %}"
+         class="nav-link text-white"
+      >
+        Maintenance plans
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'fleet:service-record-list' %}"
+         class="nav-link text-white"
+      >
+        Service history
+      </a>
+    </li>
+
+    <li>
+      <a href="{% url 'fleet:tire-set-list' %}"
+         class="nav-link text-white"
+      >
+        Tires
+      </a>
+    </li>
+
+    {% if user.is_owner %}
+      <li class="nav-item">
+        <a
+            href="{% url 'fleet:employee-list' %}"
+            class="nav-link text-white"
+        >
+          Employees
+        </a>
+      </li>
+    {% endif %}
+
+  </ul>
+
+  <div class="mt-auto">
+    <hr>
+
+    <p class="mb-2">
+      {{ user.username }}
+    </p>
+
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+
+      <button
+          type="submit"
+          class="btn btn-outline-light w-100"
+      >
+        Logout
+      </button>
+    </form>
+  </div>
+</nav>
