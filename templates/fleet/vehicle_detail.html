@@ -178,6 +178,7 @@
             <th class="px-4">Service</th>
             <th>Date</th>
             <th>Mileage</th>
+            <th>Created by</th>
             <th></th>
           </tr>
           </thead>
@@ -192,6 +193,8 @@
               <td>{{ service_record.date }}</td>
 
               <td>{{ service_record.mileage }} km</td>
+
+              <td>{{ service_record.created_by.username }}</td>
 
               <td class="text-end pe-4">
                 <a
@@ -212,7 +215,7 @@
 
           {% empty %}
             <tr>
-              <td colspan="4" class="text-center text-muted py-4">
+              <td colspan="5" class="text-center text-muted py-4">
                 No service records.
               </td>
             </tr>
@@ -290,7 +293,11 @@
               </td>
 
               <td>
-                {{ tire_installation.removed_at_mileage }} km
+                {% if tire_installation.removed_at_mileage is not None %}
+                  {{ tire_installation.removed_at_mileage }} km
+                {% else %}
+                  —
+                {% endif %}
               </td>
             </tr>
 

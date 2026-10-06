@@ -3,6 +3,7 @@
 {% block content %}
   <h1>Service history</h1>
   <p class="text-muted">Service records for all vehicles</p>
+
   <form method="get" class="mb-3">
     <div class="input-group">
       {{ search_form.query }}
@@ -20,6 +21,7 @@
       <th>Service</th>
       <th>Mileage</th>
       <th>Cost</th>
+      <th>Created by</th>
     </tr>
     </thead>
 
@@ -27,13 +29,17 @@
     {% for record in service_record_list %}
       <tr>
         <td>{{ record.date }}</td>
+
         <td>
           <a href="{% url 'fleet:vehicle-detail' pk=record.vehicle.pk %}">
             {{ record.vehicle.brand }} {{ record.vehicle.model }}
           </a>
         </td>
+
         <td>{{ record.name }}</td>
+
         <td>{{ record.mileage }} km</td>
+
         <td>
           {% if record.cost %}
             {{ record.cost }}
@@ -41,10 +47,13 @@
             —
           {% endif %}
         </td>
+
+        <td>{{ record.created_by.username }}</td>
       </tr>
+
     {% empty %}
       <tr>
-        <td colspan="5">No service records.</td>
+        <td colspan="6">No service records.</td>
       </tr>
     {% endfor %}
     </tbody>
